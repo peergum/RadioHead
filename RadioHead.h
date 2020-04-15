@@ -1235,6 +1235,7 @@ these examples and explanations and extend them to suit your needs.
 #define RH_PLATFORM_ATTINY           17
 // Spencer Kondes megaTinyCore:						   
 #define RH_PLATFORM_ATTINY_MEGA      18
+#define RH_PLATFORM_PARTICLE         19
 						   
 ////////////////////////////////////////////////////
 // Select platform automatically, if possible
@@ -1245,10 +1246,12 @@ these examples and explanations and extend them to suit your needs.
  #elif defined(MPIDE)
   // Uno32 under old MPIDE, which has been discontinued:
   #define RH_PLATFORM RH_PLATFORM_UNO32
- #elif defined(NRF51) || defined(NRF52)
+ #elif defined(NRF51)
   #define RH_PLATFORM RH_PLATFORM_NRF51
  #elif defined(NRF52)
   #define RH_PLATFORM RH_PLATFORM_NRF52
+ #elif defined(PLATFORM_ID)
+  #define RH_PLATFORM RH_PLATFORM_PARTICLE
  #elif defined(ESP8266)
   #define RH_PLATFORM RH_PLATFORM_ESP8266
  #elif defined(ESP32)
@@ -1431,6 +1434,13 @@ these examples and explanations and extend them to suit your needs.
  #define PROGMEM
   #include <Arduino.h>
 
+#elif (RH_PLATFORM == RH_PLATFORM_PARTICLE)
+ #include <SPI.h>
+ #define RH_HAVE_HARDWARE_SPI
+ #define RH_HAVE_SERIAL
+ #define PROGMEM
+ #include <Particle.h>
+
 #elif (RH_PLATFORM == RH_PLATFORM_UNIX) 
  // Simulate the sketch on Linux and OSX
  #include <RHutil/simulator.h>
@@ -1490,8 +1500,10 @@ these examples and explanations and extend them to suit your needs.
    void mgosYield(void);
  }
  #define YIELD mgosYield()
+#elif (RH_PLATFORM == RH_PLATFORM_PARTICLE)
+ #define YIELD yield();
 #else
- #define YIELD
+#define YIELD
 #endif
 
 ////////////////////////////////////////////////////

@@ -9,6 +9,8 @@
  #include <libmaple/HardwareSerial.h>
 #elif (RH_PLATFORM == RH_PLATFORM_ATTINY_MEGA)
  #include <UART.h>
+#elif (RH_PLATFORM == RH_PLATFORM_PARTICLE)
+	#define HardwareSerial USARTSerial
 #else
  #include <HardwareSerial.h>
 #endif

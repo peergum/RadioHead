@@ -20,7 +20,7 @@ PROGMEM static const RH_RF95::ModemConfig MODEM_CONFIG_TABLE[] =
     { 0x92,   0x74,    0x04}, // Bw500Cr45Sf128, AGC enabled
     { 0x48,   0x94,    0x04}, // Bw31_25Cr48Sf512, AGC enabled
     { 0x78,   0xc4,    0x0c}, // Bw125Cr48Sf4096, AGC enabled
-    
+    {0x72, 0xa4, 0x0c}, // Bw127Cr48Sf1024, AGC enabled
 };
 
 RH_RF95::RH_RF95(uint8_t slaveSelectPin, uint8_t interruptPin, RHGenericSPI& spi)
@@ -63,7 +63,7 @@ bool RH_RF95::init()
     // Add by Adrien van den Bossche <vandenbo@univ-tlse2.fr> for Teensy
     // ARM M4 requires the below. else pin interrupt doesn't work properly.
     // On all other platforms, its innocuous, belt and braces
-    pinMode(_interruptPin, INPUT); 
+    pinMode(_interruptPin, INPUT_PULLDOWN); 
 
     // Set up interrupt handler
     // Since there are a limited number of interrupt glue functions isr*() available,
@@ -123,6 +123,13 @@ bool RH_RF95::init()
 // We use this to get RxDone and TxDone interrupts
 void RH_RF95::handleInterrupt()
 {
+    _interrupted = true;
+}
+
+void RH_RF95::process() {
+    if (!_interrupted) {
+        return;
+    }
     // Read the interrupt register
     uint8_t irq_flags = spiRead(RH_RF95_REG_12_IRQ_FLAGS);
     // Read the RegHopChannel register to check if CRC presence is signalled
@@ -131,7 +138,7 @@ void RH_RF95::handleInterrupt()
 
     if (_mode == RHModeRx
 	&& ((irq_flags & (RH_RF95_RX_TIMEOUT | RH_RF95_PAYLOAD_CRC_ERROR))
-	    | !(crc_present & RH_RF95_RX_PAYLOAD_CRC_IS_ON)))
+	    || !(crc_present & RH_RF95_RX_PAYLOAD_CRC_IS_ON)))
 //    if (_mode == RHModeRx && irq_flags & (RH_RF95_RX_TIMEOUT | RH_RF95_PAYLOAD_CRC_ERROR))
     {
 	_rxBad++;
@@ -184,6 +191,7 @@ void RH_RF95::handleInterrupt()
     // clear the radio's interrupt flag. So we do it twice. Why?
     spiWrite(RH_RF95_REG_12_IRQ_FLAGS, 0xff); // Clear all IRQ flags
     spiWrite(RH_RF95_REG_12_IRQ_FLAGS, 0xff); // Clear all IRQ flags
+    _interrupted = false;
 }
 
 // These are low level functions that call the interrupt handler for the correct
@@ -226,8 +234,9 @@ void RH_RF95::validateRxBuf()
 
 bool RH_RF95::available()
 {
+    process();
     if (_mode == RHModeTx)
-	return false;
+        return false;
     setModeRx();
     return _rxBufValid; // Will be set by the interrupt handler when a good message is received
 }
@@ -254,6 +263,13 @@ bool RH_RF95::recv(uint8_t* buf, uint8_t* len)
 	ATOMIC_BLOCK_END;
     }
     clearRxBuf(); // This message accepted and cleared
+    return true;
+}
+
+bool RH_RF95::waitPacketSent()
+{
+    while (_mode == RHModeTx)
+	process(); // Wait for any previous transmit to finish
     return true;
 }
 

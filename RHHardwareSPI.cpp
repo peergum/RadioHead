@@ -20,6 +20,8 @@ HardwareSPI SPI(1);
 HardwareSPI SPI(1);
 #elif (RH_PLATFORM == RH_PLATFORM_MONGOOSE_OS) // Mongoose OS platform
 HardwareSPI SPI(1);
+// #elif (RH_PLATFORM == RH_PLATFORM_PARTICLE) // Particle platform
+// HardwareSPI SPI(1);
 #endif
 
 // Arduino Due has default SPI pins on central SPI headers, and not on 10, 11, 12, 13
