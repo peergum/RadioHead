@@ -51,8 +51,9 @@ bool RHGenericDriver::waitAvailableTimeout(uint16_t timeout)
 
 bool RHGenericDriver::waitPacketSent()
 {
-    while (_mode == RHModeTx)
-	YIELD; // Wait for any previous transmit to finish
+    while (_mode == RHModeTx) {
+        YIELD; // Wait for any previous transmit to finish
+    }
     return true;
 }
 
@@ -63,7 +64,7 @@ bool RHGenericDriver::waitPacketSent(uint16_t timeout)
     {
         if (_mode != RHModeTx) // Any previous transmit finished?
            return true;
-	YIELD;
+        YIELD;
     }
     return false;
 }

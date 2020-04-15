@@ -71,6 +71,7 @@ uint8_t RHSPIDriver::spiBurstRead(uint8_t reg, uint8_t* dest, uint8_t len)
 uint8_t RHSPIDriver::spiBurstWrite(uint8_t reg, const uint8_t* src, uint8_t len)
 {
     uint8_t status = 0;
+    // Serial.println("spiBurstWrite");
     ATOMIC_BLOCK_START;
     _spi.beginTransaction();
     digitalWrite(_slaveSelectPin, LOW);

@@ -1207,7 +1207,6 @@ these examples and explanations and extend them to suit your needs.
 */
 
 
-
 #ifndef RadioHead_h
 #define RadioHead_h
 
@@ -1235,6 +1234,7 @@ these examples and explanations and extend them to suit your needs.
 #define RH_PLATFORM_ATTINY           17
 // Spencer Kondes megaTinyCore:						   
 #define RH_PLATFORM_ATTINY_MEGA      18
+#define RH_PLATFORM_ESP32_IDF        19						   
 						   
 ////////////////////////////////////////////////////
 // Select platform automatically, if possible
@@ -1275,6 +1275,8 @@ these examples and explanations and extend them to suit your needs.
   #define RH_PLATFORM RH_PLATFORM_UNIX
  #elif defined(__APPLE__) // OSX
   #define RH_PLATFORM RH_PLATFORM_UNIX
+ #elif defined(ESP32_PLATFORM)
+  #define RH_PLATFORM RH_PLATFORM_ESP32_IDF
  #else
   #error Platform not defined! 	
  #endif
@@ -1437,8 +1439,22 @@ these examples and explanations and extend them to suit your needs.
  #define RH_HAVE_SERIAL
 #include <netinet/in.h> // For htons and friends
 
+#elif (RH_PLATFORM == RH_PLATFORM_ESP32_IDF)   // ESP32 processor on ESP_IDF platform
+//  #include <Arduino.h>
+//  #include <SPI.h>
+ #include "Esp32IDF/RHEsp32.h"
+//  #include "Esp32IDF/HardwareSPI.h"
+ #include "Esp32IDF/HardwareSerial.h"
+ #include <stdint.h>
+ #define RH_HAVE_HARDWARE_SPI
+ #define RH_HAVE_SERIAL
+ #define RH_ENABLE_ENCRYPTION_MODULE
+ #define PROGMEM
+ #define memcpy_P memcpy
+extern HardwareSerial Serial;
+
 #else
- #error Platform unknown!
+#error Platform unknown!
 #endif
 
 ////////////////////////////////////////////////////
@@ -1490,8 +1506,10 @@ these examples and explanations and extend them to suit your needs.
    void mgosYield(void);
  }
  #define YIELD mgosYield()
+#elif (RH_PLATFORM == RH_PLATFORM_ESP32_IDF)
+#define YIELD
 #else
- #define YIELD
+#define YIELD
 #endif
 
 ////////////////////////////////////////////////////
@@ -1552,7 +1570,7 @@ these examples and explanations and extend them to suit your needs.
     // according to issue #46.
     #define RH_INTERRUPT_ATTR ICACHE_RAM_ATTR
 						   
-#elif (RH_PLATFORM == RH_PLATFORM_ESP32)
+#elif (RH_PLATFORM == RH_PLATFORM_ESP32 || RH_PLATFORM == RH_PLATFORM_ESP32_IDF)
     #define RH_INTERRUPT_ATTR IRAM_ATTR
 #else
     #define RH_INTERRUPT_ATTR

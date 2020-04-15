@@ -597,6 +597,7 @@ public:
 	Bw500Cr45Sf128,	           ///< Bw = 500 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on. Fast+short range
 	Bw31_25Cr48Sf512,	   ///< Bw = 31.25 kHz, Cr = 4/8, Sf = 512chips/symbol, CRC on. Slow+long range
 	Bw125Cr48Sf4096,           ///< Bw = 125 kHz, Cr = 4/8, Sf = 4096chips/symbol, CRC on. Slow+long range
+	Bw125Cr48Sf1024,           ///< Bw = 125 kHz, Cr = 4/8, Sf = 4096chips/symbol, CRC on. Slow+long range
     } ModemConfigChoice;
 
     /// Constructor. You can have multiple instances, but each instance must have its own
@@ -822,6 +823,7 @@ public:
     /// \patam[in] on bool, true turns the payload CRC on, false turns it off
     void setPayloadCRC(bool on);
  	
+    bool waitPacketSent();
 protected:
     /// This is a low level function to handle the interrupts for one instance of RH_RF95.
     /// Called automatically by isr*()
@@ -833,6 +835,7 @@ protected:
 
     /// Clear our local receive buffer
     void clearRxBuf();
+
 
 private:
     /// Low level interrupt service routine for device connected to interrupt 0

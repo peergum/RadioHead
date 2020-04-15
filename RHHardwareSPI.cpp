@@ -20,6 +20,9 @@ HardwareSPI SPI(1);
 HardwareSPI SPI(1);
 #elif (RH_PLATFORM == RH_PLATFORM_MONGOOSE_OS) // Mongoose OS platform
 HardwareSPI SPI(1);
+#elif (RH_PLATFORM == RH_PLATFORM_ESP32_IDF)
+// define in your code
+HardwareSPI SPI(RFM_CS, SPI2_HOST, RFM_MOSI, RFM_MISO, RFM_SCK, RFM_RST);
 #endif
 
 // Arduino Due has default SPI pins on central SPI headers, and not on 10, 11, 12, 13
@@ -462,8 +465,10 @@ void RHHardwareSPI::begin()
         frequency = 1000000;
 
     SPI.begin(frequency, bitOrder, dataMode);
+#elif (RH_PLATFORM == RH_PLATFORM_ESP32_IDF)
+    SPI.begin();
 #else
- #warning RHHardwareSPI does not support this platform yet. Consider adding it and contributing a patch.
+#warning RHHardwareSPI does not support this platform yet. Consider adding it and contributing a patch.
 #endif
 
 #endif // SPI_HAS_TRANSACTION
