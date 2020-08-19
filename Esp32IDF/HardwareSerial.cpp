@@ -16,17 +16,23 @@
 #include "soc/uart_struct.h"
 #include "RHEsp32.h"
 
-static const char *TAG = "LORA";
+static const char *TAG = "RS485";
+
+static uint8_t uart_buffer[UART_BUFFER_SIZE];
 
 HardwareSerial::HardwareSerial() {
 
 }
 
-HardwareSerial::HardwareSerial(uart_port_t uart_num, const uart_config_t *config, gpio_num_t tx, gpio_num_t rx)
-: _uart_num(uart_num) {
+void HardwareSerial::begin(uart_port_t uart_num, const uart_config_t *config, gpio_num_t tx, gpio_num_t rx, gpio_num_t rts, gpio_num_t cts, uart_mode_t mode) {
+  _uart_num = uart_num;
+  ESP_LOGD(TAG, "RS pins: TX=%d, RX=%d, RTS=%d, CTS=%d", tx, rx, rts, cts);
+  ESP_ERROR_CHECK(uart_driver_install(uart_num, UART_BUFFER_SIZE * 2, 0, 0, NULL, 0));
   ESP_ERROR_CHECK(uart_param_config(uart_num, config));
-  ESP_ERROR_CHECK(uart_set_pin(uart_num, tx, rx, -1, -1));
-  ESP_ERROR_CHECK(uart_driver_install(uart_num, _uart_buffer_size, _uart_buffer_size, 10, &_uart_queue, 0));
+  ESP_ERROR_CHECK(uart_set_pin(uart_num, tx, rx, rts, cts));
+  ESP_ERROR_CHECK(uart_set_mode(uart_num, mode));
+  ESP_ERROR_CHECK(uart_set_rx_timeout(uart_num, UART_READ_TIMEOUT));
+  // ESP_ERROR_CHECK(uart_driver_install(uart_num, _uart_buffer_size, _uart_buffer_size, 10, &_uart_queue, 0));
 }
 
 int HardwareSerial::available() {

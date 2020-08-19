@@ -17,6 +17,9 @@
 #ifndef __HARDWARESERIAL_H
 #define __HARDWARESERIAL_H
 
+#define UART_BUFFER_SIZE 127
+#define UART_READ_TIMEOUT 3
+
 enum
 {
     HEX,
@@ -28,7 +31,7 @@ class HardwareSerial
 {
 public:
     HardwareSerial();
-    HardwareSerial(uart_port_t uart_num, const uart_config_t *config, gpio_num_t tx, gpio_num_t rx);
+    void begin(uart_port_t uart_num, const uart_config_t *config, gpio_num_t tx, gpio_num_t rx, gpio_num_t rts, gpio_num_t cts, uart_mode_t mode);
     int available(void);
     int waitAvailable(void);
     int waitAvailableTimeout(unsigned long timeout);
@@ -46,8 +49,8 @@ public:
     private:
         uart_port_t _uart_num;
         int _uart_buffer_size = (1024 * 2);
+        gpio_num_t _rts_pin;
         QueueHandle_t _uart_queue;
-
 };
 
 #endif

@@ -40,15 +40,6 @@ enum {
 
 #define random(min, max) (min + rand() * (max - min))
 
-#define RFM_MOSI   GPIO_NUM_13
-#define RFM_MISO   GPIO_NUM_12
-#define RFM_SCK    GPIO_NUM_14
-#define RFM_INT    GPIO_NUM_26
-#define RFM_CS     GPIO_NUM_16
-#define RFM_RST    GPIO_NUM_27
-#define RFM_DIO1   GPIO_NUM_33
-#define RFM_DIO2   GPIO_NUM_32
-
 #ifdef __cplusplus
     extern "C" {
 #endif
