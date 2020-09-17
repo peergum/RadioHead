@@ -71,7 +71,7 @@ bool RHReliableDatagram::sendtoWait(uint8_t* buf, uint8_t len, uint8_t address)
 
 	sendto(buf, len, address);
 	waitPacketSent();
-	printf("sent");
+	// printf("sent");
 	// Never wait for ACKS to broadcasts:
 	if (address == RH_BROADCAST_ADDRESS)
 	    return true;
@@ -91,7 +91,7 @@ bool RHReliableDatagram::sendtoWait(uint8_t* buf, uint8_t len, uint8_t address)
 	int32_t timeLeft;
         while ((timeLeft = timeout - (millis() - thisSendTime)) > 0)
 	{
-		printf("loop");
+		// printf("loop");
 		if (waitAvailableTimeout(timeLeft))
 		{
 		uint8_t from, to, id, flags;
